@@ -57,6 +57,27 @@ interface MessageFailedEventPayload {
   at: string;
 }
 
+interface VoiceCallEventPayload {
+  call: {
+    id: string;
+    establishmentId: string;
+    guestFullName: string;
+    guestEmail: string | null;
+    guestPhone: string | null;
+    status: 'ringing' | 'accepted' | 'rejected' | 'missed' | 'ended';
+    provider: string;
+    channelName: string;
+    startedAt: Date;
+    acceptedAt: Date | null;
+    endedAt: Date | null;
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  establishmentName?: string;
+  clientRequestId?: string | null;
+}
+
 @WebSocketGateway({
   namespace: '/chat',
   cors: {
@@ -198,6 +219,32 @@ export class ChatGateway implements OnGatewayConnection {
     conversationRooms.forEach((room) => {
       this.server.to(room).emit(CHAT_EVENTS.MESSAGE_FAILED, payload);
     });
+  }
+
+  emitIncomingCall(payload: VoiceCallEventPayload): void {
+    this.server
+      .to(buildEstablishmentRoom(payload.call.establishmentId))
+      .emit(CHAT_EVENTS.CALL_INCOMING, payload);
+  }
+
+  emitCallAccepted(payload: VoiceCallEventPayload): void {
+    this.emitCallEvent(CHAT_EVENTS.CALL_ACCEPTED, payload);
+  }
+
+  emitCallRejected(payload: VoiceCallEventPayload): void {
+    this.emitCallEvent(CHAT_EVENTS.CALL_REJECTED, payload);
+  }
+
+  emitCallMissed(payload: VoiceCallEventPayload): void {
+    this.emitCallEvent(CHAT_EVENTS.CALL_MISSED, payload);
+  }
+
+  emitCallEnded(payload: VoiceCallEventPayload): void {
+    this.emitCallEvent(CHAT_EVENTS.CALL_ENDED, payload);
+  }
+
+  private emitCallEvent(eventName: string, payload: VoiceCallEventPayload): void {
+    this.server.to(buildEstablishmentRoom(payload.call.establishmentId)).emit(eventName, payload);
   }
 
   private async authenticateSocket(client: Socket): Promise<AuthenticatedUser> {

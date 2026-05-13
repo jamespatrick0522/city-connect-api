@@ -21,4 +21,9 @@ export const envValidationSchema = Joi.object({
   JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRES_IN: Joi.string().default('1d'),
   LGU_ADMIN_REGISTER_CODE: Joi.string().min(8).required(),
+
+  AGORA_APP_ID: Joi.string().allow('').optional(),
+  AGORA_APP_CERTIFICATE: Joi.string().allow('').optional(),
+  AGORA_TOKEN_EXPIRES_SECONDS: Joi.number().default(3600),
+  CALL_RING_SECONDS: Joi.number().min(10).max(120).default(30),
 });

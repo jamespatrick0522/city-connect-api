@@ -1,4 +1,5 @@
 export * from './announcements.schema';
+export * from './calls.schema';
 export * from './establishments.schema';
 export * from './favorites.schema';
 export * from './messages.schema';

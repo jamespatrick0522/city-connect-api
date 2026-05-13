@@ -7,6 +7,7 @@ import { messages } from './messages.schema';
 import { reports } from './reports.schema';
 import { reviews } from './reviews.schema';
 import { users } from './users.schema';
+import { voiceCalls } from './calls.schema';
 
 export const usersRelations = relations(users, ({ many }) => ({
   ownedEstablishments: many(establishments, {
@@ -39,8 +40,26 @@ export const establishmentsRelations = relations(establishments, ({ one, many })
   }),
   favorites: many(favorites),
   messages: many(messages),
+  voiceCalls: many(voiceCalls),
   reports: many(reports),
   reviews: many(reviews),
+}));
+
+export const voiceCallsRelations = relations(voiceCalls, ({ one }) => ({
+  establishment: one(establishments, {
+    fields: [voiceCalls.establishmentId],
+    references: [establishments.id],
+  }),
+  acceptedBy: one(users, {
+    fields: [voiceCalls.acceptedByUserId],
+    references: [users.id],
+    relationName: 'VoiceCallAcceptedBy',
+  }),
+  rejectedBy: one(users, {
+    fields: [voiceCalls.rejectedByUserId],
+    references: [users.id],
+    relationName: 'VoiceCallRejectedBy',
+  }),
 }));
 
 export const favoritesRelations = relations(favorites, ({ one }) => ({

@@ -14,6 +14,7 @@ import { RedisModule } from './common/redis/redis.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AnnouncementsModule } from './modules/announcements/announcements.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CallsModule } from './modules/calls/calls.module';
 import { EstablishmentsModule } from './modules/establishments/establishments.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { HealthModule } from './modules/health/health.module';
@@ -37,6 +38,7 @@ import { UsersModule } from './modules/users/users.module';
     AdminModule,
     AnnouncementsModule,
     AuthModule,
+    CallsModule,
     EstablishmentsModule,
     FavoritesModule,
     HealthModule,

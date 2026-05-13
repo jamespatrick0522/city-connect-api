@@ -5,6 +5,11 @@ export const CHAT_EVENTS = {
   MESSAGE_NEW: 'message.new',
   MESSAGE_SENT: 'message.sent',
   MESSAGE_FAILED: 'message.failed',
+  CALL_INCOMING: 'call.incoming',
+  CALL_ACCEPTED: 'call.accepted',
+  CALL_REJECTED: 'call.rejected',
+  CALL_MISSED: 'call.missed',
+  CALL_ENDED: 'call.ended',
 } as const;
 
 export function normalizeGuestIdentifier(value: string): string {

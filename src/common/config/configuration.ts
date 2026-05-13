@@ -23,4 +23,10 @@ export default registerAs('app', () => ({
     jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
     lguAdminRegisterCode: process.env.LGU_ADMIN_REGISTER_CODE ?? '',
   },
+  agora: {
+    appId: process.env.AGORA_APP_ID ?? '',
+    appCertificate: process.env.AGORA_APP_CERTIFICATE ?? '',
+    tokenExpiresInSeconds: parseInt(process.env.AGORA_TOKEN_EXPIRES_SECONDS ?? '3600', 10),
+    callRingSeconds: parseInt(process.env.CALL_RING_SECONDS ?? '30', 10),
+  },
 }));
