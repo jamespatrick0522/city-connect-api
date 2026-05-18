@@ -7,6 +7,7 @@ import {
   CreateEstablishmentDto,
   ListMyEstablishmentsDto,
   SearchEstablishmentsDto,
+  UpdateEstablishmentLocationDto,
   UpdateEstablishmentStatusDto,
   VerifyEstablishmentDto,
 } from './dto/establishments.dto';
@@ -107,6 +108,39 @@ export class EstablishmentsService {
     await this.assertCanManage(establishmentId, currentUser);
 
     const updated = await this.establishmentsRepository.updateBusinessStatus(establishmentId, payload);
+
+    if (!updated) {
+      throw new NotFoundException('Establishment not found.');
+    }
+
+    await this.redisService.delByPattern('establishments:search:*');
+    if (updated.ownerUserId) {
+      await this.redisService.delByPattern(`establishments:mine:${updated.ownerUserId}:*`);
+    }
+    return updated;
+  }
+
+  async updateLocation(
+    establishmentId: string,
+    payload: UpdateEstablishmentLocationDto,
+    currentUser: AuthenticatedUser,
+  ) {
+    await this.assertCanManage(establishmentId, currentUser);
+
+    const updatePayload: {
+      latitude: string;
+      longitude: string;
+      address?: string;
+    } = {
+      latitude: payload.latitude.toFixed(7),
+      longitude: payload.longitude.toFixed(7),
+    };
+
+    if (payload.address?.trim()) {
+      updatePayload.address = payload.address.trim();
+    }
+
+    const updated = await this.establishmentsRepository.updateLocation(establishmentId, updatePayload);
 
     if (!updated) {
       throw new NotFoundException('Establishment not found.');

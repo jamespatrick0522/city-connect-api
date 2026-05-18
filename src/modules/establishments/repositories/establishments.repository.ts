@@ -142,6 +142,20 @@ export class EstablishmentsRepository extends BaseRepository<typeof establishmen
     });
   }
 
+  updateLocation(
+    establishmentId: string,
+    payload: {
+      latitude: string;
+      longitude: string;
+      address?: string;
+    },
+  ) {
+    return this.update(eq(establishments.id, establishmentId), {
+      ...payload,
+      updatedAt: new Date(),
+    });
+  }
+
   updateCoverPhoto(establishmentId: string, coverPhotoUrl: string) {
     return this.update(eq(establishments.id, establishmentId), {
       coverPhotoUrl,

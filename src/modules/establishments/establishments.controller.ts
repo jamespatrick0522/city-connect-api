@@ -23,6 +23,7 @@ import {
   CreateEstablishmentDto,
   ListMyEstablishmentsDto,
   SearchEstablishmentsDto,
+  UpdateEstablishmentLocationDto,
   UpdateEstablishmentStatusDto,
   VerifyEstablishmentDto,
 } from './dto/establishments.dto';
@@ -83,6 +84,18 @@ export class EstablishmentsController {
     @CurrentUser() currentUser: AuthenticatedUser,
   ) {
     return this.establishmentsService.updateStatus(establishmentId, payload, currentUser);
+  }
+
+  @Patch(':id/location')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('establishment', 'lgu_admin')
+  @ApiOperation({ summary: 'Establishment or LGU admin updates the public map location.' })
+  updateLocation(
+    @Param('id', ParseUUIDPipe) establishmentId: string,
+    @Body() payload: UpdateEstablishmentLocationDto,
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    return this.establishmentsService.updateLocation(establishmentId, payload, currentUser);
   }
 
   @Post(':id/cover-photo')

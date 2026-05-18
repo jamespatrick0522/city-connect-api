@@ -4,6 +4,8 @@ import {
   IsEmail,
   IsIn,
   IsInt,
+  IsLatitude,
+  IsLongitude,
   IsOptional,
   IsString,
   Length,
@@ -143,4 +145,19 @@ export class UpdateEstablishmentStatusDto {
   @IsString()
   @MaxLength(255)
   statusNote?: string;
+}
+
+export class UpdateEstablishmentLocationDto {
+  @Type(() => Number)
+  @IsLatitude()
+  latitude!: number;
+
+  @Type(() => Number)
+  @IsLongitude()
+  longitude!: number;
+
+  @IsOptional()
+  @IsString()
+  @Length(5, 255)
+  address?: string;
 }
