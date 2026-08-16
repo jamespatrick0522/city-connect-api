@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -24,6 +25,7 @@ import {
   ListMyEstablishmentsDto,
   SearchEstablishmentsDto,
   UpdateEstablishmentLocationDto,
+  UpdateEstablishmentProfileDto,
   UpdateEstablishmentStatusDto,
   VerifyEstablishmentDto,
 } from './dto/establishments.dto';
@@ -37,7 +39,7 @@ export class EstablishmentsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('establishment')
-  @ApiOperation({ summary: 'Register/claim an establishment listing (pending verification).' })
+  @ApiOperation({ summary: 'Save an establishment listing draft.' })
   create(@Body() payload: CreateEstablishmentDto, @CurrentUser() currentUser: AuthenticatedUser) {
     return this.establishmentsService.register(payload, currentUser);
   }
@@ -62,10 +64,33 @@ export class EstablishmentsController {
     return this.establishmentsService.findById(establishmentId);
   }
 
+  @Patch(':id/profile')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('establishment', 'lgu_admin')
+  @ApiOperation({ summary: 'Update establishment profile and permit/BIR details.' })
+  updateProfile(
+    @Param('id', ParseUUIDPipe) establishmentId: string,
+    @Body() payload: UpdateEstablishmentProfileDto,
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    return this.establishmentsService.updateProfile(establishmentId, payload, currentUser);
+  }
+
+  @Post(':id/submit-for-approval')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('establishment')
+  @ApiOperation({ summary: 'Submit a draft/rejected listing for LGU approval once requirements are complete.' })
+  submitForApproval(
+    @Param('id', ParseUUIDPipe) establishmentId: string,
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    return this.establishmentsService.submitForApproval(establishmentId, currentUser);
+  }
+
   @Patch(':id/verify')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('lgu_admin')
-  @ApiOperation({ summary: 'LGU verifies/rejects a listing.' })
+  @ApiOperation({ summary: 'LGU verifies/rejects a listing with an optional rejection reason.' })
   verify(
     @Param('id', ParseUUIDPipe) establishmentId: string,
     @Body() payload: VerifyEstablishmentDto,
@@ -96,6 +121,70 @@ export class EstablishmentsController {
     @CurrentUser() currentUser: AuthenticatedUser,
   ) {
     return this.establishmentsService.updateLocation(establishmentId, payload, currentUser);
+  }
+
+  @Post(':id/gallery-images')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('establishment', 'lgu_admin')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: { type: 'string', format: 'binary' },
+      },
+      required: ['image'],
+    },
+  })
+  @ApiOperation({ summary: 'Upload one gallery image. Listings require 3 to 5 images before approval.' })
+  uploadGalleryImage(
+    @Param('id', ParseUUIDPipe) establishmentId: string,
+    @Req() req: Request,
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    if (!req.cloudinaryAsset?.secure_url) {
+      throw new BadRequestException('No image uploaded. Use form-data key "image".');
+    }
+
+    return this.establishmentsService.addGalleryImage(establishmentId, req.cloudinaryAsset, currentUser);
+  }
+
+  @Post(':id/location-video')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('establishment', 'lgu_admin')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        video: { type: 'string', format: 'binary' },
+      },
+      required: ['video'],
+    },
+  })
+  @ApiOperation({ summary: 'Upload or replace the optional location/landmark video. Max 30MB.' })
+  uploadLocationVideo(
+    @Param('id', ParseUUIDPipe) establishmentId: string,
+    @Req() req: Request,
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    if (!req.cloudinaryAsset?.secure_url) {
+      throw new BadRequestException('No video uploaded. Use form-data key "video".');
+    }
+
+    return this.establishmentsService.uploadLocationVideo(establishmentId, req.cloudinaryAsset, currentUser);
+  }
+
+  @Delete(':id/media/:mediaId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('establishment', 'lgu_admin')
+  @ApiOperation({ summary: 'Delete a gallery image or location video.' })
+  deleteMedia(
+    @Param('id', ParseUUIDPipe) establishmentId: string,
+    @Param('mediaId', ParseUUIDPipe) mediaId: string,
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    return this.establishmentsService.deleteMedia(establishmentId, mediaId, currentUser);
   }
 
   @Post(':id/cover-photo')

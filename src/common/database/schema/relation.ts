@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 
 import { announcements } from './announcements.schema';
+import { establishmentMedia } from './establishment-media.schema';
 import { establishments } from './establishments.schema';
 import { favorites } from './favorites.schema';
 import { messages } from './messages.schema';
@@ -40,9 +41,17 @@ export const establishmentsRelations = relations(establishments, ({ one, many })
   }),
   favorites: many(favorites),
   messages: many(messages),
+  media: many(establishmentMedia),
   voiceCalls: many(voiceCalls),
   reports: many(reports),
   reviews: many(reviews),
+}));
+
+export const establishmentMediaRelations = relations(establishmentMedia, ({ one }) => ({
+  establishment: one(establishments, {
+    fields: [establishmentMedia.establishmentId],
+    references: [establishments.id],
+  }),
 }));
 
 export const voiceCallsRelations = relations(voiceCalls, ({ one }) => ({
@@ -114,3 +123,5 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     references: [establishments.id],
   }),
 }));
+
+

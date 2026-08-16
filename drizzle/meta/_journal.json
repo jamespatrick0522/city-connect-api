@@ -15,6 +15,13 @@
       "when": 1778639337342,
       "tag": "0001_tan_starbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786883776796,
+      "tag": "0002_strange_randall_flagg",
+      "breakpoints": true
     }
   ]
 }

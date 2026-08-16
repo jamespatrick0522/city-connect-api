@@ -4,7 +4,7 @@ import { SQL, and, desc, eq, ilike, or } from 'drizzle-orm';
 import { TOKENS } from '../../../common/constants/tokens';
 import { AppDb } from '../../../common/database/database.types';
 import { BaseRepository } from '../../../common/database/repositories/base.repository';
-import { establishments } from '../../../common/database/schema';
+import { establishments, type NewEstablishment } from '../../../common/database/schema';
 import { SearchEstablishmentsDto } from '../dto/establishments.dto';
 
 @Injectable()
@@ -82,7 +82,7 @@ export class EstablishmentsRepository extends BaseRepository<typeof establishmen
   async listByOwner(
     ownerUserId: string,
     options: {
-      listingStatus?: 'pending' | 'verified' | 'rejected';
+      listingStatus?: 'draft' | 'pending' | 'verified' | 'rejected';
       page: number;
       pageSize: number;
     },
@@ -119,11 +119,21 @@ export class EstablishmentsRepository extends BaseRepository<typeof establishmen
     };
   }
 
-  verifyListing(establishmentId: string, listingStatus: 'verified' | 'rejected', verifiedByUserId: string) {
+  verifyListing(establishmentId: string, listingStatus: 'verified' | 'rejected', verifiedByUserId: string, statusNote?: string) {
+    const isVerified = listingStatus === 'verified';
+
     return this.update(eq(establishments.id, establishmentId), {
       listingStatus,
-      verifiedByUserId,
-      verifiedAt: new Date(),
+      statusNote: statusNote ?? null,
+      verifiedByUserId: isVerified ? verifiedByUserId : null,
+      verifiedAt: isVerified ? new Date() : null,
+      updatedAt: new Date(),
+    });
+  }
+
+  updateProfile(establishmentId: string, payload: Partial<NewEstablishment>) {
+    return this.update(eq(establishments.id, establishmentId), {
+      ...payload,
       updatedAt: new Date(),
     });
   }
@@ -163,7 +173,7 @@ export class EstablishmentsRepository extends BaseRepository<typeof establishmen
     });
   }
 
-  countByListingStatus(listingStatus: 'pending' | 'verified' | 'rejected', city?: string) {
+  countByListingStatus(listingStatus: 'draft' | 'pending' | 'verified' | 'rejected', city?: string) {
     const filters: SQL<unknown>[] = [eq(establishments.listingStatus, listingStatus)];
 
     if (city?.trim()) {
@@ -174,3 +184,5 @@ export class EstablishmentsRepository extends BaseRepository<typeof establishmen
     return this.count(where);
   }
 }
+
+

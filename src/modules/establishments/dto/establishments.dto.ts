@@ -51,6 +51,11 @@ export class CreateEstablishmentDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(120)
+  businessPermitNumber?: string;
+
+  @IsOptional()
+  @IsString()
   contactNumber?: string;
 
   @IsOptional()
@@ -127,8 +132,13 @@ export class ListMyEstablishmentsDto {
 }
 
 export class VerifyEstablishmentDto {
-  @IsIn(LISTING_STATUSES)
-  listingStatus!: (typeof LISTING_STATUSES)[number];
+  @IsIn(['verified', 'rejected'])
+  listingStatus!: 'verified' | 'rejected';
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  statusNote?: string;
 }
 
 export class UpdateEstablishmentStatusDto {
@@ -160,4 +170,55 @@ export class UpdateEstablishmentLocationDto {
   @IsString()
   @Length(5, 255)
   address?: string;
+}
+
+export class UpdateEstablishmentProfileDto {
+  @IsOptional()
+  @IsString()
+  @Length(2, 120)
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(2, 160)
+  name?: string;
+
+  @IsOptional()
+  @IsIn(CATEGORIES)
+  category?: (typeof CATEGORIES)[number];
+
+  @IsOptional()
+  @IsString()
+  @Length(5, 255)
+  address?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(4000)
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  services?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  businessPermitNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  contactNumber?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  opensAt?: string;
+
+  @IsOptional()
+  @IsString()
+  closesAt?: string;
 }

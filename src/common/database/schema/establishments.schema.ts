@@ -19,7 +19,12 @@ export const establishmentCategoryEnum = pgEnum('establishment_category', [
   'other',
 ]);
 
-export const listingStatusEnum = pgEnum('listing_status', ['pending', 'verified', 'rejected']);
+export const listingStatusEnum = pgEnum('listing_status', [
+  'draft',
+  'pending',
+  'verified',
+  'rejected',
+]);
 export const businessStatusEnum = pgEnum('business_status', ['open', 'closed', 'temporarily_closed']);
 
 export const establishments = pgTable(
@@ -32,6 +37,7 @@ export const establishments = pgTable(
     description: text('description'),
     category: establishmentCategoryEnum('category').notNull(),
     services: text('services'),
+    businessPermitNumber: varchar('business_permit_number', { length: 120 }),
     contactNumber: varchar('contact_number', { length: 30 }),
     email: varchar('email', { length: 255 }),
     address: varchar('address', { length: 255 }).notNull(),
@@ -41,7 +47,7 @@ export const establishments = pgTable(
     closesAt: varchar('closes_at', { length: 8 }),
     isOpenNow: boolean('is_open_now').default(false).notNull(),
     coverPhotoUrl: varchar('cover_photo_url', { length: 500 }),
-    listingStatus: listingStatusEnum('listing_status').default('pending').notNull(),
+    listingStatus: listingStatusEnum('listing_status').default('draft').notNull(),
     businessStatus: businessStatusEnum('business_status').default('closed').notNull(),
     statusNote: varchar('status_note', { length: 255 }),
     verifiedByUserId: uuid('verified_by_user_id').references(() => users.id, {
@@ -61,3 +67,5 @@ export const establishments = pgTable(
 
 export type Establishment = typeof establishments.$inferSelect;
 export type NewEstablishment = typeof establishments.$inferInsert;
+
+
