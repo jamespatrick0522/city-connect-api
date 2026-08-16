@@ -5,7 +5,6 @@ import {
   CloudinaryUploadMiddleware,
   CloudinaryVideoUploadMiddleware,
 } from '../../common/cloudinary/cloudinary-upload.middleware';
-import { CloudinaryService } from '../../common/cloudinary/cloudinary.service';
 import { EstablishmentsController } from './establishments.controller';
 import { EstablishmentsService } from './establishments.service';
 import { EstablishmentMediaRepository } from './repositories/establishment-media.repository';
@@ -17,7 +16,6 @@ import { EstablishmentsRepository } from './repositories/establishments.reposito
     EstablishmentsService,
     EstablishmentsRepository,
     EstablishmentMediaRepository,
-    CloudinaryService,
     CloudinaryUploadMiddleware,
     CloudinaryGalleryImageUploadMiddleware,
     CloudinaryVideoUploadMiddleware,
@@ -39,3 +37,5 @@ export class EstablishmentsModule implements NestModule {
       .forRoutes({ path: 'establishments/:id/location-video', method: RequestMethod.POST });
   }
 }
+
+
