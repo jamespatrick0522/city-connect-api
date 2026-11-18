@@ -187,10 +187,7 @@ export class ChatGateway implements OnGatewayConnection {
       message.guestPhone,
     );
 
-    this.server.to(establishmentRoom).emit(CHAT_EVENTS.MESSAGE_NEW, message);
-    conversationRooms.forEach((room) => {
-      this.server.to(room).emit(CHAT_EVENTS.MESSAGE_NEW, message);
-    });
+    this.server.to([establishmentRoom, ...conversationRooms]).emit(CHAT_EVENTS.MESSAGE_NEW, message);
   }
 
   emitMessageSent(payload: MessageSentEventPayload): void {
@@ -201,10 +198,7 @@ export class ChatGateway implements OnGatewayConnection {
       payload.message.guestPhone,
     );
 
-    this.server.to(establishmentRoom).emit(CHAT_EVENTS.MESSAGE_SENT, payload);
-    conversationRooms.forEach((room) => {
-      this.server.to(room).emit(CHAT_EVENTS.MESSAGE_SENT, payload);
-    });
+    this.server.to([establishmentRoom, ...conversationRooms]).emit(CHAT_EVENTS.MESSAGE_SENT, payload);
   }
 
   emitMessageFailed(payload: MessageFailedEventPayload): void {
@@ -215,10 +209,7 @@ export class ChatGateway implements OnGatewayConnection {
       payload.guestPhone,
     );
 
-    this.server.to(establishmentRoom).emit(CHAT_EVENTS.MESSAGE_FAILED, payload);
-    conversationRooms.forEach((room) => {
-      this.server.to(room).emit(CHAT_EVENTS.MESSAGE_FAILED, payload);
-    });
+    this.server.to([establishmentRoom, ...conversationRooms]).emit(CHAT_EVENTS.MESSAGE_FAILED, payload);
   }
 
   emitIncomingCall(payload: VoiceCallEventPayload): void {
